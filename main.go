@@ -46,5 +46,5 @@ func main() {
 
 	jsonDecoder.Decode(&respData)
 
-	fmt.Printf("%v ℃\n", respData.Main.Temp)
+	fmt.Printf("%v\n", respData.Main.Temp)
 }
