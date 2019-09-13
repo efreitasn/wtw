@@ -29,7 +29,7 @@ func main() {
 
 		setFlag.Parse(os.Args[2:])
 
-		if len(setFlag.Args()) == 0 {
+		if *cityID == "" && *apiKey == "" {
 			logError.Print("Error while parsing arguments.\n\n")
 			logError.Println("Usage of set:")
 
