@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
@@ -14,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Downnload go@v1.12.9
+    - name: Download go@v1.12.9
       uses: actions/setup-go@v1
       with:
         go-version: 1.12.9
