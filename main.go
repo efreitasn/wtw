@@ -2,49 +2,100 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
 )
 
-type weatherResponse struct {
+// WeatherResponse is the data returned from a request to the OpenWeather API.
+type WeatherResponse struct {
 	Main struct {
 		Temp float64 `json:"temp"`
 	} `json:"main"`
 }
 
 func main() {
-	apiKey := os.Getenv("WTW_API_KEY")
+	fetchWeatherInfo := len(os.Args) == 1
 
-	if apiKey == "" {
-		panic("WTW_API_KEY env variable not set.\n")
+	if !fetchWeatherInfo {
+		if os.Args[1] != "set" {
+			logError.Fatal("Error while parsing arguments.")
+		}
+
+		setFlag := flag.NewFlagSet("set", flag.ExitOnError)
+		cityID := setFlag.String("city-id", "", "Set the city ID.")
+		apiKey := setFlag.String("api-key", "", "Set the API key.")
+
+		setFlag.Parse(os.Args[2:])
+
+		if len(setFlag.Args()) == 0 {
+			logError.Print("Error while parsing arguments.\n\n")
+			logError.Println("Usage of set:")
+
+			setFlag.PrintDefaults()
+		}
+
+		c, err := GetConfig()
+
+		if os.IsNotExist(err) {
+			c = &Config{}
+		} else if err != nil {
+			logError.Fatal("Error while reading the config file.")
+		}
+
+		if *cityID != "" {
+			c.CityID = *cityID
+		}
+
+		if *apiKey != "" {
+			c.APIKey = *apiKey
+		}
+
+		err = c.Write()
+
+		if err != nil {
+			logError.Fatal("Error while writing the config file")
+		}
+
+		return
 	}
 
-	cityID := os.Getenv("WTW_CITY_ID")
+	c, err := GetConfig()
 
-	if cityID == "" {
-		panic("WTW_CITY_ID env variable not set.\n")
+	if os.IsNotExist(err) {
+		logError.Fatal("--city-id and --api-key are not set.")
+	}
+
+	if err != nil {
+		logError.Fatal("Error while reading the config file")
+	}
+
+	if c.APIKey == "" {
+		logError.Fatal("--api-key is not set.")
+	}
+
+	if c.CityID == "" {
+		logError.Fatal("--city-id is not set.")
 	}
 
 	url := fmt.Sprintf(
 		"http://api.openweathermap.org/data/2.5/weather?id=%v&units=metric&APPID=%v",
-		cityID,
-		apiKey,
+		c.CityID,
+		c.APIKey,
 	)
 
 	resp, err := http.Get(url)
-
 	if err != nil {
-		fmt.Fprint(os.Stderr, "Error while making HTTP request.")
-		os.Exit(1)
+		logError.Fatal("Error while making HTTP request.")
 	}
 	defer resp.Body.Close()
 
-	var respData weatherResponse
+	var respData WeatherResponse
 
 	jsonDecoder := json.NewDecoder(resp.Body)
 
 	jsonDecoder.Decode(&respData)
 
-	fmt.Printf("%v\n", respData.Main.Temp)
+	logSuccess.Printf("%v\n", respData.Main.Temp)
 }
