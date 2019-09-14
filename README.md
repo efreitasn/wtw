@@ -29,3 +29,11 @@ To get the current weather info, run:
 ```bash
 wtw
 ```
+
+### Change temperature unit
+By default, wtw uses degrees Celsius, but it also supports Fahrenheit and Kelvin.
+
+For instance, to use degrees Fahrenheit as the temperate unit:
+```bash
+wtw set --unit F
+```

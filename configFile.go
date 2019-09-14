@@ -3,23 +3,29 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"path"
 )
 
-func getConfigFilePath() (string, error) {
-	homeDir, err := os.UserHomeDir()
+// TempCelsius is the Celsius constant.
+const TempCelsius = "C"
 
-	if err != nil {
-		return "", err
-	}
+// TempFahrenheit is the Fahrenheit constant.
+const TempFahrenheit = "F"
 
-	return path.Join(homeDir, ".wtw"), nil
-}
+// TempKelvin is the Kelvin constant.
+const TempKelvin = "K"
 
 // Config represents the config data related to accessing the OpenWeather API.
 type Config struct {
 	APIKey string `json:"apiKey"`
 	CityID string `json:"cityID"`
+	Unit   string `json:"unit"`
+}
+
+// NewConfig returns a new config with default values.
+func NewConfig() *Config {
+	return &Config{
+		Unit: TempCelsius,
+	}
 }
 
 // GetConfig returns the config data stored in the config file.
@@ -63,8 +69,8 @@ func (c *Config) Write() error {
 	defer f.Close()
 
 	jsonEnc := json.NewEncoder(f)
-	err = jsonEnc.Encode(c)
 
+	err = jsonEnc.Encode(c)
 	if err != nil {
 		return err
 	}

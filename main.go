@@ -29,10 +29,11 @@ func main() {
 		setFlag := flag.NewFlagSet("set", flag.ExitOnError)
 		cityID := setFlag.String("city-id", "", "Set the city ID.")
 		apiKey := setFlag.String("api-key", "", "Set the API key.")
+		tempUnit := setFlag.String("unit", "", "Set the temperature unit.")
 
 		setFlag.Parse(os.Args[2:])
 
-		if *cityID == "" && *apiKey == "" {
+		if *cityID == "" && *apiKey == "" && *tempUnit == "" {
 			logError.Print("Error while parsing arguments.\n\n")
 			logError.Println("Usage of set:")
 
@@ -42,7 +43,7 @@ func main() {
 		c, err := GetConfig()
 
 		if os.IsNotExist(err) {
-			c = &Config{}
+			c = NewConfig()
 		} else if err != nil {
 			logError.Fatal("Error while reading the config file.")
 		}
@@ -53,6 +54,19 @@ func main() {
 
 		if *apiKey != "" {
 			c.APIKey = *apiKey
+		}
+
+		if *tempUnit != "" {
+			switch *tempUnit {
+			case TempCelsius:
+				fallthrough
+			case TempFahrenheit:
+				fallthrough
+			case TempKelvin:
+				c.Unit = *tempUnit
+			default:
+				logError.Fatal("Invalid temperature unit.")
+			}
 		}
 
 		err = c.Write()
@@ -83,7 +97,8 @@ func main() {
 	}
 
 	url := fmt.Sprintf(
-		"http://api.openweathermap.org/data/2.5/weather?id=%v&units=metric&APPID=%v",
+		"http://api.openweathermap.org/data/2.5/weather?units=%v&id=%v&APPID=%v",
+		configUnitToAPIUnit(c.Unit),
 		c.CityID,
 		c.APIKey,
 	)
@@ -101,8 +116,8 @@ func main() {
 	jsonDecoder.Decode(&respData)
 
 	if len(respData.Weather) > 0 {
-		logSuccess.Printf("%v°C - %v\n", respData.Main.Temp, respData.Weather[0].Main)
+		logSuccess.Printf("%v°%v - %v\n", respData.Main.Temp, c.Unit, respData.Weather[0].Main)
 	} else {
-		logSuccess.Printf("%v°C\n", respData.Main.Temp)
+		logSuccess.Printf("%v°%v\n", respData.Main.Temp, c.Unit)
 	}
 }
