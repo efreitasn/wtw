@@ -37,3 +37,10 @@ For instance, in order to use degrees Fahrenheit as the temperate unit, run
 ```bash
 wtw set --unit F
 ```
+
+### Output format
+The output string is the current temperature in the specified unit followed by a description of the current weather. For instance, a cloudy day would be something like
+
+```bash
+13.94°C - Clouds
+```
