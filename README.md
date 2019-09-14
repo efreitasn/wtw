@@ -6,7 +6,7 @@ You can download one of the binaries available on the [releases page](https://gi
 
 ### Installing using go
 ```bash
-go get github.com/efreitasn/wtw
+go get -u github.com/efreitasn/wtw
 $(go env GOPATH)/bin/wtw
 ```
 
@@ -25,7 +25,7 @@ First of all, you need to set your API key and your city ID. In order to do that
 wtw set --city-id YOUR_CITY_ID --api-key YOUR_API_KEY
 ```
 
-To get the current weather info, run:
+To get the current weather info, run
 ```bash
 wtw
 ```
@@ -33,7 +33,7 @@ wtw
 ### Change temperature unit
 By default, wtw uses degrees Celsius, but it also supports Fahrenheit and Kelvin.
 
-For instance, to use degrees Fahrenheit as the temperate unit:
+For instance, in order to use degrees Fahrenheit as the temperate unit, run
 ```bash
 wtw set --unit F
 ```

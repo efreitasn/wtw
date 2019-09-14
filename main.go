@@ -72,7 +72,7 @@ func main() {
 		err = c.Write()
 
 		if err != nil {
-			logError.Fatal("Error while writing the config file")
+			logError.Fatal("Error while writing the config file.")
 		}
 
 		return
@@ -85,7 +85,7 @@ func main() {
 	}
 
 	if err != nil {
-		logError.Fatal("Error while reading the config file")
+		logError.Fatal("Error while reading the config file.")
 	}
 
 	if c.APIKey == "" {
