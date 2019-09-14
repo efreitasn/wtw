@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LATEST_TAG=$(git tag | head -1)
+LATEST_TAG=$(git tag | tail -1)
 TARGETS=("linux/amd64" "darwin/amd64")
 
 for TARGET in "${TARGETS[@]}"; do
