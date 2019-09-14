@@ -10,6 +10,9 @@ import (
 
 // WeatherResponse is the data returned from a request to the OpenWeather API.
 type WeatherResponse struct {
+	Weather []struct {
+		Main string `json:"main"`
+	} `json:"weather"`
 	Main struct {
 		Temp float64 `json:"temp"`
 	} `json:"main"`
@@ -97,5 +100,9 @@ func main() {
 
 	jsonDecoder.Decode(&respData)
 
-	logSuccess.Printf("%v\n", respData.Main.Temp)
+	if len(respData.Weather) > 0 {
+		logSuccess.Printf("%v°C - %v\n", respData.Main.Temp, respData.Weather[0].Main)
+	} else {
+		logSuccess.Printf("%v°C\n", respData.Main.Temp)
+	}
 }
